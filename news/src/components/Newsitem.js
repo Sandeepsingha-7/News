@@ -1,17 +1,20 @@
-import React,{Component} from 'react';
+import React, { Component } from 'react';
+import {Link} from 'react-router-dom';
+
 export default class Newsitem extends Component {
+
+  render() {
+    let { title, description, urlToImage, url } = this.props;
+    return (
+      <div className="card my-3" style={{ height: '27rem' }}>
+        <img src={!urlToImage ? "https://post.healthline.com/wp-content/uploads/2022/02/woman_reading_in_grass_outside-1200x628-facebook-1200x628.jpg" : urlToImage} className="card-img-top" alt="..." />
+        <div className="card-body">
+          <h5 className="card-title">{title.slice(0, 40)}</h5>
+          <p className="card-text">{description.slice(0, 88)}...</p>
+          <Link to={url} target="_blank" className="btn btn-dark">Read more</Link>
+        </div>
    
-   render() {
-     let {title, description}=this.props;
-      return(
-        <div className="card" style={{width: "18rem"}}>
-  <img src="..." className="card-img-top" alt="..."/>
-  <div className="card-body">
-    <h5 className="card-title">{title}</h5>
-    <p className="card-text">{description}</p>
-    <a href="/" className="btn btn-primary">Go somewhere</a>
-  </div>
-</div>
-      )
-   }
+      </div>
+    )
+  }
 }
