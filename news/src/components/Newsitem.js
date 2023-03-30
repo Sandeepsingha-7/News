@@ -6,7 +6,7 @@ export default class Newsitem extends Component {
   render() {
     let { title, description, urlToImage, url, author, time ,source} = this.props;
     return (
-      <div className="card my-3" style={{ height: '34rem' }}>
+      <div className="card my-3" style={{ height: '36rem' }}>
         <img src={!urlToImage ? "https://post.healthline.com/wp-content/uploads/2022/02/woman_reading_in_grass_outside-1200x628-facebook-1200x628.jpg" : urlToImage} className="card-img-top" alt="..." />
         <div className="card-body">
           <h5 className="card-title">{title.slice(0, 40)}</h5>
