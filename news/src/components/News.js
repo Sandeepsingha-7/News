@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import Newsitem from './Newsitem';
 
 import Spinner from './Spinner';
@@ -6,89 +6,67 @@ import PropTypes from 'prop-types';
 
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-export default class News extends Component {
-  static defaultProps = {
-    country: 'in',
-    category: 'general'
-  }
-  static propTypes = {
-    country: PropTypes.string,
-    category: PropTypes.string
-  }
+export default function News(props) {
+
+  const[articles,setArticles]=useState([])
+const[loading,setLoading]=useState(true)
+  const[totalResults,setTotalResults]=useState(0)
+//const[page,setPage]=useState(1)
+  
 
   
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      articles: [],
-      loading: false,
-    
-      totalResults: 0
-     }
-    document.title = `${this.capitalize(this.props.category)} - News`
-  }
 
-
-
-  capitalize = (string) => {
+ const capitalize = (string) => {
     return string.charAt(0).toUpperCase() +
       string.slice(1)
   }
 
-  async updateNews() {
-    this.props.setProgress(10)
-    let url = `https://saurav.tech/NewsAPI/top-headlines/category/${this.props.category}/${this.props.country}.json`
-    this.setState({ loading: true })
+  const updateNews=async()=>{
+    props.setProgress(10)
+    const url = `https://saurav.tech/NewsAPI/top-headlines/category/${props.category}/${props.country}.json`
+    setLoading(true)
     let data = await fetch(url)
-    this.props.setProgress(30)
+    props.setProgress(30)
     let parseData = await data.json()
     console.log(parseData);
-    this.props.setProgress(70)
-    this.setState({
-      articles: parseData.articles,
-      totalResults: parseData.totalResults, loading: false
-    })
-    this.props.setProgress(100)
+    props.setProgress(70)
+    setArticles(parseData.articles)
+setTotalResults(parseData.totalResults)
+    setLoading(false)
+    props.setProgress(100)
   }
 
+useEffect(()=>{
+  document.title = `${capitalize(props.category)} - News`  
+  updateNews();
+},[])
 
-  async componentDidMount() {
+const fetchMoreData = async () => {
 
-    await this.updateNews()
-  }
-
-  fetchMoreData = async() => {
+    let url = `https://saurav.tech/NewsAPI/top-headlines/category/${props.category}/${props.country}.json`
     
-    let url = `https://saurav.tech/NewsAPI/top-headlines/category/${this.props.category}/${this.props.country}.json`
-    this.setState({ loading: true })
     let data = await fetch(url)
     let parseData = await data.json()
     console.log(parseData);
-    this.setState({
-      articles: this.state.articles.concat(parseData.articles),
-      totalResults: parseData.totalResults, loading: false
-    })
-  }
-
-
-  render() {
+     setArticles(articles.concat(parseData.articles))
+setTotalResults(parseData.totalResults)
     
+}
 
-    
-    return (
+ return (
       <>
-        
-        <h1 className="text-center my-3" id='headlinefont'>TOP {this.props.category.toUpperCase()} HEADLINES</h1>
-        {this.state.loading && <Spinner />}
+
+        <h1 className="text-center" id='headlinefont' style={{marginTop:'80px'}}>TOP {props.category.toUpperCase()} HEADLINES</h1>
+        {loading && <Spinner />} 
         <InfiniteScroll
-          dataLength={this.state.articles.length}
-          next={this.fetchMoreData}
-          hasMore={this.state.articles.lenght !== this.state.totalResults}
+          dataLength={articles.length}
+          next={fetchMoreData}
+          hasMore={articles.length !== totalResults}
           loader={<Spinner />}>
           <div className="container">
             <div className="row" >
-              {this.state.articles.map((element) => {
+              {articles.map((element) => {
                 return <div className="col-md-4" key={element.url}>
                   <Newsitem title={element.title ? element.title : ''} description={element.description ? element.description : ''} urlToImage={element.urlToImage} url={element.url} author={element.author ? element.author : 'unknown'} time={element.publishedAt} source={element.source.name} />
                 </div>
@@ -103,4 +81,12 @@ export default class News extends Component {
     )
   }
 
+
+News.defaultProps = {
+  country: 'in',
+  category: 'general'
+}
+News.propTypes = {
+  country: PropTypes.string,
+  category: PropTypes.string
 }
